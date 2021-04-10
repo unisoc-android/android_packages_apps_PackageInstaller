@@ -197,6 +197,11 @@ public final class ReviewPermissionsFragment extends PreferenceFragmentCompat
         for (int groupNum = 0; groupNum < preferenceGroupCount; groupNum++) {
             final PreferenceGroup preferenceGroup = preferenceGroups.get(groupNum);
 
+            //*UNISOC: 1115005 fix crash with nullpointException
+            if(null == preferenceGroup) {
+                continue;
+            }
+
             final int preferenceCount = preferenceGroup.getPreferenceCount();
             for (int prefNum = 0; prefNum < preferenceCount; prefNum++) {
                 Preference preference = preferenceGroup.getPreference(prefNum);

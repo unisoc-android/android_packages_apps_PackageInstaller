@@ -46,6 +46,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.permission.PermissionManager;
 import android.text.Html;
@@ -708,8 +709,21 @@ public class GrantPermissionsActivity extends Activity
                 // Set the permission message as the title so it can be announced.
                 setTitle(message);
 
-                mViewHandler.updateUi(groupState.mGroup.getName(), numGrantRequests, currentIndex,
+                /*UNISOC: 1106446 disable runtimepermission dialog and grant permissions in background for test {@ */
+                if ((!"user".equals(Build.TYPE) && SystemProperties.get("persist.support.test").equals("true"))
+                        || SystemProperties.get("persist.support.securetest").equals("1")) {
+                    if ((groupState != null) && (groupState.mGroup != null)) {
+                        groupState.mGroup.grantRuntimePermissions(false);
+                        groupState.mState = GroupState.STATE_ALLOWED;
+                        if (!showNextPermissionGroupGrantRequest()) {
+                            setResultAndFinish();
+                        }
+                    }
+                } else {
+                /* @} */
+                    mViewHandler.updateUi(groupState.mGroup.getName(), numGrantRequests, currentIndex,
                         icon, message, detailMessage, mButtonLabels);
+                }
 
                 return true;
             }
